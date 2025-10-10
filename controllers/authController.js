@@ -36,15 +36,19 @@ module.exports.loginUser = async (req, res) =>{
     let {email, password} = req.body;
 
     let user = await usermodel.findOne({email: email});
-    if(!user) return res.status(401).send("Email or Password incorrect");
-
+    if(!user){
+        req.flash("error", "Email or Password incorrect");
+        return res.redirect("/");
+    }
+        
     bcrypt.compare(password, user.password, (err, result)=>{
         if(result){
             let token = generateToken(user);
             res.cookie("token", token);
-            res.send("You can login!");
+            res.redirect("/shop");
         }else{
-            return res.status(401).send("Email or Password incorrect");
+            req.flash("error", "Email or Password incorrect");
+            return res.redirect("/");
         }
     })
 };

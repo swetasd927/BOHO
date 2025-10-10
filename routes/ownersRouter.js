@@ -21,8 +21,8 @@ if(process.env.NODE_ENV === "development"){
     });
 }
 
-router.get("/", (req,res)=>{
-    res.send("Hey");
+router.get("/admin", (req,res)=>{
+    res.render("createproducts");
 });
 
 
