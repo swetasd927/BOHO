@@ -7,13 +7,18 @@ module.exports.registerUser = async (req,res) =>{
      try{
         let {email, password, fullname} = req.body;
 
-        let user = await  usermodel.findOne({email: email})
-        if(user) return res.status(401).send("You already have an account, please login.")
+        let user = await userModel.findOne({ email: email });
+        if (user) {
+            req.flash("error", "You already have an account, please login.");
+            return res.redirect("/");
+        }
 
         bcrypt.genSalt(10, function(err, salt){
             bcrypt.hash(password, salt, async(err, hash)=>{
-                if(err) return res.send(err.message);
-                else{
+                if(err){
+                    req.flash("error", err.message);
+                    return res.redirect("/");
+                }else{
                     let user = await usermodel.create({
                     email,
                     password: hash,
@@ -22,18 +27,19 @@ module.exports.registerUser = async (req,res) =>{
                     
                     let token = generateToken(user);
                     res.cookie("token", token);
-                    res.send("user created successfully");
+                    res.redirect("/shop");
                 }
             });
         });   
     }catch(err){
-        console.log(err.message);
-        res.status(500).send(err.message);
+        req.flash(err.message);
+        res.redirect("/");
     }
 };
 
 module.exports.loginUser = async (req, res) =>{
-    let {email, password} = req.body;
+    try{
+        let {email, password} = req.body;
 
     let user = await usermodel.findOne({email: email});
     if(!user){
@@ -50,5 +56,16 @@ module.exports.loginUser = async (req, res) =>{
             req.flash("error", "Email or Password incorrect");
             return res.redirect("/");
         }
-    })
+    });
+    
+    }catch(err){
+    req.flash(err.message);
+    res.redirect("/");
+    }
 };
+module.exports.logout = (req, res) =>{
+    res.cookie("token", "");
+    res.redirect("/");
+}
+
+    

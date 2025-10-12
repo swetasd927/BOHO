@@ -4,14 +4,15 @@ const isLoggedIn = require('../middleware/isLoggedIn');
 
 router.get("/", (req,res)=>{
     let error = req.flash("error");
-    res.render("index", { error });
+    res.render("auth", { error });
 });
 
 router.get("/shop", isLoggedIn, (req,res)=>{
-    res.render("shop");
+    res.render('shop', {products: []});
 });
 
 router.get("/logout", isLoggedIn, (req,res)=>{
-    res.render("shop");
+    res.cookie("token", "")
+    res.redirect("/");
 });
 module.exports = router;

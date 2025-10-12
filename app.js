@@ -30,12 +30,14 @@ app.use(flash());
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 
-app.use("/owners",ownersRouter);
 app.use("/users", usersRouter);
+app.use("/", indexRouter);
+app.use("/owners",ownersRouter);
 app.use("/products", productsRouter);
-app.use("/index", indexRouter);
 
 app.listen(3000,()=>{
     console.log("Server started at http://localhost:3000");
     
 })
+
+module.exports = app;
