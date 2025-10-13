@@ -1,3 +1,11 @@
+process.removeAllListeners('warning');
+process.on('warning', (warning) => {
+    if (warning.name === 'DeprecationWarning' && warning.message.includes('util.isArray')) {
+        return; // Ignore this specific warning
+    }
+    console.warn(warning);
+});
+
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");

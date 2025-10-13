@@ -7,7 +7,7 @@ module.exports.registerUser = async (req,res) =>{
      try{
         let {email, password, fullname} = req.body;
 
-        let user = await userModel.findOne({ email: email });
+        let user = await usermodel.findOne({ email: email });
         if (user) {
             req.flash("error", "You already have an account, please login.");
             return res.redirect("/");
@@ -27,12 +27,13 @@ module.exports.registerUser = async (req,res) =>{
                     
                     let token = generateToken(user);
                     res.cookie("token", token);
+                    req.flash("success", `Welcome to Scatch, ${fullname}! Your account has been created successfully.`);
                     res.redirect("/shop");
                 }
             });
         });   
     }catch(err){
-        req.flash(err.message);
+        req.flash("error", err.message);
         res.redirect("/");
     }
 };
@@ -51,6 +52,7 @@ module.exports.loginUser = async (req, res) =>{
         if(result){
             let token = generateToken(user);
             res.cookie("token", token);
+            req.flash("success", `Welcome back, ${user.fullname}!`);
             res.redirect("/shop");
         }else{
             req.flash("error", "Email or Password incorrect");
@@ -59,13 +61,14 @@ module.exports.loginUser = async (req, res) =>{
     });
     
     }catch(err){
-    req.flash(err.message);
+    req.flash("error", err.message);
     res.redirect("/");
     }
 };
-module.exports.logout = (req, res) =>{
-    res.cookie("token", "");
+module.exports.logout = (req, res) => {
+    res.clearCookie("token"); // deletes the cookie properly
+    req.flash("success", "You have been logged out successfully!");
     res.redirect("/");
-}
+};
 
     
