@@ -66,8 +66,12 @@
         <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer">
           <!-- Product Image -->
           <div class="w-full h-40 flex items-center justify-center" style="background: <%= product.bgcolor || '#fbbf24' %>">
-            <% if (product.image && product.image.startsWith('http')) { %>
+            <% if (product.image && typeof product.image === 'string' && product.image.startsWith('http')) { %>
               <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-full object-cover">
+            <% } else if (product.image && product.image.data) { %>
+              <img src="data:image/jpeg;base64,<%= product.image.data.toString('base64') %>" alt="<%= product.name %>" class="w-full h-full object-cover">
+            <% } else if (product.image && Buffer.isBuffer(product.image)) { %>
+              <img src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>" class="w-full h-full object-cover">
             <% } else { %>
               <svg class="w-16 h-16 text-white opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
@@ -77,26 +81,26 @@
           
           <!-- Product Info -->
           <div class="p-2.5" style="background: <%= product.panelcolor || '#ef4444' %>">
-          <div class="flex items-center justify-between">
-            <div style="color: <%= product.textcolor || '#ffffff' %>">
-              <h4 class="font-medium mb-0.5 text-sm"><%= product.name %></h4>
-              <div class="flex items-center gap-2">
-                <p class="font-semibold text-sm">₹ <%= product.price %></p>
-                <% if (product.discount > 0) { %>
-                  <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full"><%= product.discount %>% OFF</span>
-                <% } %>
+            <div class="flex items-center justify-between">
+              <div style="color: <%= product.textcolor || '#ffffff' %>">
+                <h4 class="font-medium mb-0.5 text-sm"><%= product.name %></h4>
+                <div class="flex items-center gap-2">
+                  <p class="font-semibold text-sm">₹ <%= product.price %></p>
+                  <% if (product.discount > 0) { %>
+                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full"><%= product.discount %>% OFF</span>
+                  <% } %>
+                </div>
               </div>
+              <button class="bg-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100 transition-colors duration-200">
+                <svg class="w-3.5 h-3.5" style="color: <%= product.panelcolor || '#ef4444' %>" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 3.22l-.61-.6a5.5 5.5 0 0 0-7.78 7.77L10 18.78l8.39-8.4a5.5 5.5 0 0 0-7.78-7.77l-.61.61z"/>
+                </svg>
+              </button>
             </div>
-            <button class="bg-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100 transition-colors duration-200">
-              <svg class="w-3.5 h-3.5" style="color: <%= product.panelcolor || '#ef4444' %>" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 3.22l-.61-.6a5.5 5.5 0 0 0-7.78 7.77L10 18.78l8.39-8.4a5.5 5.5 0 0 0-7.78-7.77l-.61.61z"/>
-              </svg>
-            </button>
           </div>
         </div>
+        <% }); %>
       </div>
-      <% }); %>
-    </div>
     <% } else { %>
       <!-- Empty State -->
       <div class="flex flex-col items-center justify-center h-96">
