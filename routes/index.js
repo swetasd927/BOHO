@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const isLoggedIn = require('../middleware/isLoggedIn');
-const productModel = require('../models/productmodel');
+const productmodel = require('../models/productmodel');
 
 
 router.get("/", (req,res)=>{
@@ -11,7 +11,7 @@ router.get("/", (req,res)=>{
 
 router.get("/shop", isLoggedIn, async(req,res)=>{
     try{
-        let products = await productModel.find();
+        let products = await productmodel.find();
         let success = req.flash("success");
         res.render('shop', { products, success });
     } catch(err){
