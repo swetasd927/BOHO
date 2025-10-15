@@ -21,10 +21,16 @@ router.get("/shop", isLoggedIn, async(req,res)=>{
 });
 
 router.get("/cart", isLoggedIn, async(req,res)=>{
-        let user = await usermodel.findOne({email: req.user.email}).populate("cart");
-        const bill = (Number(user.cart[0].price) + 20)-Number(user.cart[0].discount);
-        
-        res.render('cart', { user, bill }); 
+        try{
+            let user = await usermodel.
+            findOne({email: req.user.email}).
+            populate("cart");
+            const bill = (Number(user.price) + 20)-Number(user.discount);
+            res.render('cart', { user, bill }); 
+        }catch(err){
+            console.error(err);
+            res.redirect("/shop")
+        }
 });
 
 router.get("/addtocart/:productsid", isLoggedIn, async(req,res)=>{
