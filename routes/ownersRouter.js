@@ -115,7 +115,7 @@ router.delete('/product/:id', async (req, res) => {
     }
 });
 
-router.get('/product/edit: id', async (req, res) => {
+router.get('/product/edit/:id', async (req, res) => {
     try{
         const product = await productmodel.findById(req.params.id);
         res.json(product);

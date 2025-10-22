@@ -102,7 +102,7 @@ router.get("/shop", isLoggedIn, async(req,res) => {
             success,
             error,
             stats,
-            currentFilter: req.query,
+            currentFilters: req.query,
             totalResults: products.length,
             cartCount,
             loggedin: true 
@@ -114,7 +114,7 @@ router.get("/shop", isLoggedIn, async(req,res) => {
             success: "",
             error: "",
             stats: { total: 0, onSale: 0, priceRanges: { under1000: 0, between1000_3000: 0, above3000: 0 }},
-            currentFilter: {},
+            currentFilters: {},
             totalResults: 0,
             cartCount: 0,
             loggedin: true
