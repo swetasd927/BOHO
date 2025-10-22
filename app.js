@@ -43,6 +43,28 @@ app.use("/", indexRouter);
 app.use("/owners",ownersRouter);
 app.use("/products", productsRouter);
 
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Global error handler:', err);
+    req.flash('error', 'Something went wrong. Please try again.');
+    
+    // If the original request was for an owner route, redirect to owner login
+    if (req.path.startsWith('/owners')) {
+        return res.redirect('/owners/login');
+    }
+    
+    res.redirect('/shop');
+});
+
+// 404 handler - must be last
+app.use((req, res) => {
+    res.status(404).render('404', { 
+        loggedin: false, 
+        cartCount: 0,
+        error: 'Page not found' 
+    });
+});
+
 app.listen(3000,()=>{
     console.log("Server started at http://localhost:3000");
     
