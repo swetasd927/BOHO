@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
-const config = require("config");
-
 const dbgr = require("debug")("development:mongoose");
 
+// Use environment variable directly
+const mongoURL = process.env.MONGO_URL;
+
 mongoose
-.connect(`${config.get("MONGO_URL")}/premiumbagshop`)   
-.then(function(){
-    dbgr("connected");   
-})
-.catch(function(err){
-    dbgr(err); 
-});
+  .connect(`${mongoURL}/premiumbagshop`)
+  .then(() => {
+    dbgr("connected");
+  })
+  .catch((err) => {
+    dbgr(err);
+  });
 
 module.exports = mongoose.connection;
