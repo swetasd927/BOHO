@@ -102,3 +102,7 @@ bgcolor F4E0E1
 - Panel Color: `#B5BFA8`
 - Background Color: `#E0E8D5`
 
+fix the image rendering issue in owners/admin page
+sorting by filters dont work some time
+
+
