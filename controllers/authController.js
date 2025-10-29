@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { generateToken } = require('../utils/generateToken');
+const e = require('connect-flash');
 
 module.exports.registerUser = async (req,res) =>{
      try{
@@ -41,28 +42,64 @@ module.exports.registerUser = async (req,res) =>{
 
 module.exports.loginUser = async (req, res) =>{
     try{
-        let { email, password } = req.body;
-    let user = await usermodel.findOne({ email });
+        console.log('Login attempt for:', req.body.email);
+        
+        if(!req.body || !req.body.email || !req.body.password){
+            console.log('Missing credentials in request');
+            req.flash("error", "Please provide both email and password");
+            return res.redirect("/");
+        }
+
+        const { email, password } = req.body;
+        const user = await usermodel.findOne({ email });
+
     if(!user){
+        console.log('User not found: ', email);
         req.flash("error", "Email or Password incorrect");
         return res.redirect("/");
     }
         
     bcrypt.compare(password, user.password, (err, result) => {
+        if(err){
+            console.error('bcrypt error: ', err);
+            req.flash("error", "An error occurred during login");
+            return res.redirect("/");
+        }
+
         if(result){
-            let token = generateToken(user);
-            res.cookie("token", token);
-            req.flash("success", `Welcome back, ${user.fullname}!`);
-            res.redirect("/shop");
+            try{
+                console.log('Password correct for:', email);
+                const token = generateToken(user);
+                console.log('Generate token:', token ? 'Token created' : 'Token generation failed');
+
+                res.cookie("token", token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'lax',
+                    path: '/'
+                });
+
+                req.flash("success",`Welcome back, ${user.fullname}!`);
+                console.log('Redirecting to /shop');
+                return res.redirect("/shop");
+                
+            }catch(tokenErr){
+                console.error('Token generation error: ', tokenErr);
+                req.flash("error", "Login failed! Please try again");
+                return res.redirect("/");
+            }
+            
         }else{
+            console.log('Password incorrect for: ', email);
             req.flash("error", "Email or Password incorrect");
             return res.redirect("/");
         }
     });
     
     }catch(err){
-    req.flash("error", err.message);
-    res.redirect("/");
+        console.error('Login error: ', err);
+    req.flash("error", err.message || "Something went wrong");
+    return res.redirect("/");
     }
 };
 
